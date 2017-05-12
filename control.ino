@@ -7,7 +7,6 @@ std_msgs::String str_msg;
 ros::Publisher chatter("chatter", &str_msg);
 
 //defining publisher alert
-//str_msg.data = Hit Alert!;
 long duration;
 long dist;
 
@@ -28,12 +27,22 @@ void distance_detect()
   
   duration = pulseIn(echoPin, HIGH); 
   dist = (duration/2) / 29.1; //turn into cm
-  
-  //visualise
- // Serial.print(dist);
- // Serial.println(" cm");
+
 }
 
+void control()
+{
+  if (dist < 6)
+  {
+    str_msg.data = "Hit";
+    chatter.publish( &str_msg );
+  }
+  else
+  {
+    str_msg.data = "Continue";
+    chatter.publish( &str_msg );
+  }
+}
 void setup()
 {
   Serial.begin (9600);
@@ -50,8 +59,8 @@ void setup()
 void loop()
 {
   distance_detect();
-  Serial.println(" test");
- 
+  control();
+  
   nh.spinOnce();
-  delay(1000);
+  delay(1);
 }
