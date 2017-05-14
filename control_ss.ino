@@ -38,6 +38,7 @@ void messageCb( const std_msgs::Int8& msg)
 
 void message(int sera)
 { 
+  // 255 high speed of motor
   switch(sera)
   {
     case 1:
@@ -46,7 +47,7 @@ void message(int sera)
       //stop_motor();
       digitalWrite(dirB, LOW);
       digitalWrite(brkB, LOW);
-      analogWrite(pwmB, 255); 
+      analogWrite(pwmB, 120); 
     
       analogWrite(pwmA, 0); 
       break;
@@ -57,7 +58,7 @@ void message(int sera)
       //stop_motor();
       digitalWrite(dirA, HIGH);
       digitalWrite(brkA, LOW);
-      analogWrite(pwmA, 255); 
+      analogWrite(pwmA, 120); 
      
       analogWrite(pwmB, 0);
       break; 
@@ -74,11 +75,11 @@ void message(int sera)
       //front
       digitalWrite(dirA, HIGH);
       digitalWrite(brkA, LOW);
-      analogWrite(pwmA, 255);
+      analogWrite(pwmA, 120);
     
       digitalWrite(dirB, LOW);
       digitalWrite(brkB, LOW);
-      analogWrite(pwmB, 255);
+      analogWrite(pwmB, 120);
       // move_motor(front);
       break;      
     }
