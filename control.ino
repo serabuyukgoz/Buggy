@@ -1,65 +1,60 @@
 #include <ros.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Int8.h>
+
+#include "init.h"
+
+String x;
+int data;
+int dist;
+
 
 //ros definitions for publisher and subscriber
 ros::NodeHandle nh;
 std_msgs::String str_msg;
-ros::Publisher chatter("chatter", &str_msg);
 
-//defining publisher alert
-long duration;
-long dist;
-
-//defining pin
-#define trigPin 6
-#define echoPin 5
-
-void distance_detect()
+//callback function
+void messageCb( const std_msgs::Int8& msg)
 {
- 
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(10);
-  //delay(1000);
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10); 
-  //delay(1000);
-  digitalWrite(trigPin, LOW);
-  
-  duration = pulseIn(echoPin, HIGH); 
-  dist = (duration/2) / 29.1; //turn into cm
-
+  data = msg.data;
+  decide_direction(data); 
 }
 
-void control()
+ros::Publisher sensor ("sensor", &str_msg);
+ros::Subscriber<std_msgs::Int8>path("chatter", &messageCb);
+
+std_msgs::Int8 debug2;
+ros::Publisher debug ("debug", &debug2);
+
+void control_obstacle()
 {
   if (dist < 6)
   {
     str_msg.data = "Hit";
-    chatter.publish( &str_msg );
+    sensor.publish( &str_msg );
+    stop_motor();
   }
   else
   {
-    str_msg.data = "Continue";
-    chatter.publish( &str_msg );
+    //move back
+    move_back();
   }
 }
+
 void setup()
 {
-  Serial.begin (9600);
+  init_setup();
   
-  //defining ultrasonic sensor
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
-  
-  //initials for mesage
+  //ros initializing 
   nh.initNode();
-  nh.advertise(chatter);  
+  nh.advertise(sensor);
+  nh.advertise(debug); 
+  nh.subscribe(path); 
 }
 
 void loop()
 {
-  distance_detect();
-  control();
+  dist = distance_detect();
   
   nh.spinOnce();
   delay(1);
