@@ -1,137 +1,50 @@
+#include <ros.h>
+#include <std_msgs/String.h>
+#include <std_msgs/Int8.h>
+
 #include "init.h"
 
-//make it global to reach from other functions
-int distance;
-// 255 high speed of motor
-int speeds = 255;
+String x;
+int data;
 
-void init_setup()
+//ros definitions for publisher and subscriber
+ros::NodeHandle nh;
+std_msgs::String str_msg;
+
+//callback function
+void messageCb( const std_msgs::Int8& msg)
 {
-  //defining led
-  pinMode(led, OUTPUT);
-  
-  //defining ultrasonic sensor
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
-  
-  //defining motors
-  pinMode(dirA, OUTPUT);//Channel A
-  pinMode(dirB, OUTPUT);//Channel B
-  pinMode(brkA, OUTPUT);//break for channel A
-  pinMode(brkB, OUTPUT);//break for channel B
+  data = msg.data;
+  decide_direction(data); 
 }
 
-//function for distance detection 
-//by using ultra sonic sensor
-int distance_detect()
-{ 
-  long duration;
-  
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(10);
-  
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10); 
-  
-  digitalWrite(trigPin, LOW);
-  
-  duration = pulseIn(echoPin, HIGH); 
-  distance = (duration/2) / 29.1; //turn into cm
-  
-  return distance;
-}
+ros::Publisher sensor ("sensor", &str_msg);
+ros::Subscriber<std_msgs::Int8>path("chatter", &messageCb);
 
-//******************************
-//Definitions motors for different movements
+std_msgs::Int8 debug2;
+ros::Publisher debug ("debug", &debug2);
 
-void stop_motor()
+void messagePublish()
 {
-  //stop both of them
-  digitalWrite(brkA, HIGH);
-  digitalWrite(brkB, HIGH);
-  analogWrite(pwmA, 0);
-  analogWrite(pwmB, 0);
+    str_msg.data = "Hit";
+    sensor.publish( &str_msg );
 }
 
-void move_front()
+void setup()
 {
-  digitalWrite(dirA, HIGH);
-  digitalWrite(brkA, LOW);
-  analogWrite(pwmA, speeds);
-    
-  digitalWrite(dirB, LOW);
-  digitalWrite(brkB, LOW);
-  analogWrite(pwmB, speeds);
-}
-
-void move_back()
-{
-  digitalWrite(dirA, LOW);
-  digitalWrite(brkA, LOW);
-  analogWrite(pwmA, speeds);
+  init_setup();
   
-  digitalWrite(dirB, HIGH);
-  digitalWrite(brkB, LOW);
-  analogWrite(pwmB, speeds);
+  //ros initializing 
+  nh.initNode();
+  nh.advertise(sensor);
+  nh.advertise(debug); 
+  nh.subscribe(path); 
 }
 
-//to be able to turn 
-//motors must be use full speed  
-void move_right()
+void loop()
 {
-  digitalWrite(dirA, HIGH);
-  digitalWrite(brkA, LOW);
-  analogWrite(pwmA, 255); 
-   
-  analogWrite(pwmB, 0);
-}
-
-void move_left()
-{
-  digitalWrite(dirB, LOW);
-  digitalWrite(brkB, LOW);
-  analogWrite(pwmB, 255); 
-   
-  analogWrite(pwmA, 0);
-}
-
-//**************************************
-
-void decide_direction(int given)
-{   
-  switch(given)
-  {
-    case 1:
-    {
-      //turn left
-      move_left();
-      break;
-    }
-    case 2:
-    {
-      //turn right
-      move_right();
-      break; 
-    }
-    case 3:
-    {
-      //go to check
-      control_obstacle();
-      break;   
-    }
-    case 4:    
-    {
-      //towards move
-      move_front();
-      break;      
-    }
-    default:
-    {
-      debug2.data = sera;
-      debug.publish( &debug2 );
-      //other cases do not move
-      stop_motor();
-      break;
-    }
-  }
+  distance_detect();
+  
+  nh.spinOnce();
+  delay(1);
 }
