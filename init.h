@@ -4,19 +4,19 @@
 #include "Arduino.h" 
 
 //defining pin for ultrasonic sensor
-#define trigPin 6
-#define echoPin 5
+const int trigPin = 6;
+const int echoPin = 5;
 
 //defining pin for motors
-#define dirA 12
-#define dirB 13
-#define pwmA 3
-#define pwmB 11
-#define brkA 9
-#define brkB 8
+const int dirA = 12;
+const int dirB = 13;
+const int pwmA = 3;
+const int pwmB = 11;
+const int brkA = 9;
+const int brkB = 8;
 
-//defining pin for led
-#define led 2
+//defining pin for buzzer
+const int buzzer = 2;
 
 void init_setup();
 int distance_detect();
@@ -26,9 +26,12 @@ void move_back();
 void move_right();
 void move_left();
 
+void buzzer();
+
+
 void control_obstacle();
 void decide_direction(int);
 
-
+void messagePublish();
 
 #endif
