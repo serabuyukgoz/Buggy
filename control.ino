@@ -6,8 +6,6 @@
 
 String x;
 int data;
-int dist;
-
 
 //ros definitions for publisher and subscriber
 ros::NodeHandle nh;
@@ -26,19 +24,10 @@ ros::Subscriber<std_msgs::Int8>path("chatter", &messageCb);
 std_msgs::Int8 debug2;
 ros::Publisher debug ("debug", &debug2);
 
-void control_obstacle()
+void messagePublish()
 {
-  if (dist < 6)
-  {
     str_msg.data = "Hit";
     sensor.publish( &str_msg );
-    stop_motor();
-  }
-  else
-  {
-    //move back
-    move_back();
-  }
 }
 
 void setup()
@@ -54,7 +43,7 @@ void setup()
 
 void loop()
 {
-  dist = distance_detect();
+  distance_detect();
   
   nh.spinOnce();
   delay(1);
