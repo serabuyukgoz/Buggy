@@ -1,8 +1,9 @@
 import socket
-from rosPublisher import rosPublisher
+from rosPublisher import rosPub
 
-def javaServer:
-	soc = socket.socket()
+def javaServer():
+
+        soc = socket.socket()
 	host = ""
 	port = 2004
 	soc.bind((host, port))
@@ -12,15 +13,9 @@ def javaServer:
 		print ("Got Connection from", addr)
 		msg = conn.recv(1024)
 		print(msg)
-		rosPublisher(msg)
+		rosPub(msg)
 	
 	
 if __name__ == '__main__':
 	javaServer()
 
-
-	
-	
-	
-	
-		

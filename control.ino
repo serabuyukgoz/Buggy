@@ -6,6 +6,7 @@
 
 String x;
 int data;
+int dist;
 
 //ros definitions for publisher and subscriber
 ros::NodeHandle nh;
@@ -24,10 +25,13 @@ ros::Subscriber<std_msgs::Int8>path("chatter", &messageCb);
 std_msgs::Int8 debug2;
 ros::Publisher debug ("debug", &debug2);
 
-void messagePublish()
+void messagePublish(int count)
 {
-    str_msg.data = "Hit";
-    sensor.publish( &str_msg );
+  //  str_msg.data = "Hit : " + count;
+  //  sensor.publish( &str_msg );
+    
+     debug2.data = count;
+      debug.publish( &debug2 );
 }
 
 void setup()
@@ -43,7 +47,8 @@ void setup()
 
 void loop()
 {
-  distance_detect();
+  led();
+  dist = distance_detect();
   
   nh.spinOnce();
   delay(1);
