@@ -1,3 +1,5 @@
+#include <Ultrasonic.h>
+
 #include <ros.h>
 #include <std_msgs/String.h>
 #include <std_msgs/Int8.h>
@@ -12,30 +14,29 @@ int dist;
 ros::NodeHandle nh;
 std_msgs::String str_msg;
 
-//callback function
+//callback function for subscriber always listen
 void messageCb( const std_msgs::Int8& msg)
 {
   data = msg.data;
+
+  //after get data send to decision function
   decide_direction(data); 
 }
 
 ros::Publisher sensor ("sensor", &str_msg);
 ros::Subscriber<std_msgs::Int8>path("chatter", &messageCb);
 
-std_msgs::Int8 debug2;
-ros::Publisher debug ("debug", &debug2);
-
-void messagePublish(int count)
+//function for publishing warning message
+void messagePublish()
 {
-  //  str_msg.data = "Hit : " + count;
-  //  sensor.publish( &str_msg );
-    
-     debug2.data = count;
-      debug.publish( &debug2 );
+  str_msg.data = "Hit";
+  sensor.publish( &str_msg );
 }
 
+//main setup function for arduino
 void setup()
 {
+  //setup function for initializing every sensors
   init_setup();
   
   //ros initializing 
@@ -43,13 +44,18 @@ void setup()
   nh.advertise(sensor);
   nh.advertise(debug); 
   nh.subscribe(path); 
+
 }
 
+//main loop function
 void loop()
 {
-  led();
+//turned on to led	
+  led(); 
+ //checking distance regularly
   dist = distance_detect();
-  
+
+  //for rosserial connection stay open
   nh.spinOnce();
   delay(1);
 }

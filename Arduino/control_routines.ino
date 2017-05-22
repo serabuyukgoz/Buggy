@@ -1,13 +1,16 @@
 #include "init.h"
 
 //make it global to reach from other functions
+//distance of ultrasonic sensor
 int distance;
+
 // 255 high speed of motor
 int speeds = 180;
 
 int count;
 boolean checkFlag = true;
 
+//Initilasing every sensor 
 void init_setup()
 {
   //defininf led
@@ -16,10 +19,6 @@ void init_setup()
   //defining buzzer
   pinMode(buzPin, OUTPUT);
   
-  //defining ultrasonic sensor
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
-  
   //defining motors
   pinMode(dirA, OUTPUT);//Channel A
   pinMode(dirB, OUTPUT);//Channel B
@@ -27,26 +26,20 @@ void init_setup()
   pinMode(brkB, OUTPUT);//break for channel B
 }
 
+//This function illuminates led 
+//for understading of buggy works
 void led()
 {
   digitalWrite(ledPin, HIGH);
 }
-//function for distance detection 
-//by using ultra sonic sensor
+
+//Using ultrasoic library
+/for getting ditance in cm
 int distance_detect()
 { 
-  long duration;
-  
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(10);
-  
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10); 
-  
-  digitalWrite(trigPin, LOW);
-  
-  duration = pulseIn(echoPin, HIGH); 
-  distance = (duration/2) / 29.1; //turn into cm
+  //define ultasonic sensors
+  Ultrasonic ultrasonic1(trigPin, echoPin);
+  distance = ultrasonic1.Ranging(CM);
   
   return distance;
 }
@@ -125,14 +118,19 @@ void move_left_back()
 }
 
 //**************************************
+
+//This function check obstacles
+//and return a flag
 void control_obstacle()
 {
   if (distance < 8)
   {
-    count = 2;
-    messagePublish(distance);
+    //enter if close buggy close to an obstacle
+    //Publishing warning message
+    //invoke buzzer
+    messagePublish();
     stop_motor();
-	buzzer();
+    buzzer();
     checkFlag = false;
   }else
   {
@@ -140,14 +138,23 @@ void control_obstacle()
   }
 }
 
+//this function for physical
+//create noise for a short time
 void buzzer()
 {
-	tone(buzPin, 1000);
-	delay(500);
-	noTone(buzPin);
+   tone(buzPin, 1000);
+   delay(500);
+   noTone(buzPin);
 }
+
+//function deside motors movement
+//according to data come from subscriber
 void decide_direction(int given)
 {   
+
+  //Cases motor needed to move backward
+  //first check is there any obstacle and
+  //move according to result
   switch(given)
   {
     case 1:
@@ -169,13 +176,13 @@ void decide_direction(int given)
     case 11:
     {
       //front left
-	  move_left_front();
+      move_left_front();
       break;   
     }
     case 12:    
     {
       //towards move
-	 move_right_front();
+      move_right_front();
       break;      
     }
     case 21:
@@ -186,8 +193,7 @@ void decide_direction(int given)
       {
         move_left_back();
       }
-      
-        break;
+      break;
     }
     case 22:
     {
@@ -196,14 +202,11 @@ void decide_direction(int given)
       if(checkFlag == true)
       {
         move_right_back();
-      }
-      
+      }      
       break;
     }
     default:
     {
-      debug2.data = given;
-      debug.publish( &debug2 );
       //other cases do not move
       stop_motor();
       break;

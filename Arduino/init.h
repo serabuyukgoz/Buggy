@@ -20,7 +20,7 @@ const int buzPin = 2;
 const int ledPin = 7;
 
 
-//
+//functions
 void led();
 
 void init_setup();
@@ -39,6 +39,6 @@ void buzzer();
 void control_obstacle();
 void decide_direction(int);
 
-void messagePublish(int);
+void messagePublish();
 
 #endif
