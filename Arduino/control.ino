@@ -41,8 +41,7 @@ void setup()
   
   //ros initializing 
   nh.initNode();
-  nh.advertise(sensor);
-  nh.advertise(debug); 
+  nh.advertise(sensor); 
   nh.subscribe(path); 
 
 }
@@ -50,10 +49,11 @@ void setup()
 //main loop function
 void loop()
 {
-//turned on to led	
-  led(); 
+ 
  //checking distance regularly
   dist = distance_detect();
+  //onstacle avoidance
+  control_obstacle();
 
   //for rosserial connection stay open
   nh.spinOnce();

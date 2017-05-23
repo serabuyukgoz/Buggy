@@ -9,6 +9,7 @@ int speeds = 180;
 
 int count;
 boolean checkFlag = true;
+boolean backFlag = false;
 
 //Initilasing every sensor 
 void init_setup()
@@ -34,7 +35,7 @@ void led()
 }
 
 //Using ultrasoic library
-/for getting ditance in cm
+//for getting ditance in cm
 int distance_detect()
 { 
   //define ultasonic sensors
@@ -128,9 +129,12 @@ void control_obstacle()
     //enter if close buggy close to an obstacle
     //Publishing warning message
     //invoke buzzer
+    if (backFlag == true) {
+      //only run if robot move backward
     messagePublish();
     stop_motor();
     buzzer();
+    }
     checkFlag = false;
   }else
   {
@@ -160,13 +164,14 @@ void decide_direction(int given)
     case 1:
     {
       //front
-	  move_front();
+       move_front();
+       backFlag = false;
       break;
     }
     case 2:
     {
 	//back 
-      control_obstacle();
+      backFlag = true;
       if(checkFlag == true)
       {
         move_back();
@@ -177,18 +182,20 @@ void decide_direction(int given)
     {
       //front left
       move_left_front();
+      backFlag = false;
       break;   
     }
     case 12:    
     {
       //towards move
       move_right_front();
+      backFlag = false;
       break;      
     }
     case 21:
     {
       //Back left
-      control_obstacle();
+       backFlag = true;
       if(checkFlag == true)
       {
         move_left_back();
@@ -198,13 +205,19 @@ void decide_direction(int given)
     case 22:
     {
       //Back Right
-      control_obstacle();
+       backFlag = true;
       if(checkFlag == true)
       {
         move_right_back();
       }      
       break;
     }
+    case 100:
+    { 
+      //turned on to led
+      //for check connetion of communication	
+      led();
+    }  
     default:
     {
       //other cases do not move
