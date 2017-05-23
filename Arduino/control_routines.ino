@@ -221,6 +221,7 @@ void decide_direction(int given)
     default:
     {
       //other cases do not move
+      backFlag = false;
       stop_motor();
       break;
     }
