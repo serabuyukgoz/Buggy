@@ -1,12 +1,13 @@
 import socket
 from rosPublisher import rosPub
 
-int start = 0
+start = 0
 
 #open led to show all connections bind
 def led():
-        if (start == 0)
-        rosPub('led')
+        global start
+        if (start == 0):
+                rosPub('led')
         start = 2
         
 # this function is listening java socket
