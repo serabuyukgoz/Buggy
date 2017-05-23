@@ -18,6 +18,8 @@ def decideValue(msg):
 	return 21
     elif msg == "backright":
 	return 22
+    elif msg == 'led':    
+        return 100    
     else:
 	return 0
 		
@@ -28,5 +30,6 @@ def rosPub(msg):
     rospy.init_node('talker', anonymous=True) #defining nodes of ros
 	
     pub.publish(value) #publishing value
+
 
 
